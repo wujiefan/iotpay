@@ -1,0 +1,63 @@
+@import './mixin';
+@col-b: #5581FE;
+@col-bl: #7DA4FF;
+@col-r: #F8504A;
+page,
+body {
+  font-size: 32px;
+  height: 100%;
+  box-sizing: border-box;
+}
+.taro-img,
+image {
+  width: 100%;
+}
+
+button {
+  outline: none;
+}
+
+.clearfix:after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+.clearfix {
+  zoom: 1;
+  &:after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+}
+
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+.hide {
+  display: none !important;
+}
+
+.show {
+  display: block !important;
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.position-center {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  margin: auto;
+}

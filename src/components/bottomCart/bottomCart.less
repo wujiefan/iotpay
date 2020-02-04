@@ -1,0 +1,102 @@
+@import '../../style/base.less';
+.bottom-bar{
+    .wh(100%,120px);
+    .fj;
+    box-sizing: border-box;
+    position: relative;
+    .bottom-left{
+        .fj;
+        align-items: center;
+        font-size:28px;
+        .cart {
+            .wh(74px, 74px);
+            .bg('../static/images/cart.png');
+            position: relative;
+            margin: 0 10px;
+            .count {
+                .wh(32px, 32px);
+                .sc(24px, @col-b);
+                border: 1px solid @col-b;
+                line-height: 32px;
+                text-align: center;
+                border-radius: 50%;
+                background: #FFF;
+                position: absolute;
+                right: -10px;
+                top: -10px;
+            }
+        }
+    }
+    .bottom-right{
+        .fj(flex-start);
+        align-items: center;
+        .price{
+            .sc(46px, @col-r);
+            font-size:46px;
+        }
+        .btn-primary{
+            .wh(240px,90px);
+            .sc(32px,#FFF);
+            line-height: 90px;
+            text-align: center;
+            border-radius: 45px;
+            background: linear-gradient(270deg, rgba(85, 129, 254, 1) 0%, rgba(125, 164, 255, 1) 100%);
+            margin: 0 20px;
+        }
+    }
+    .bottom-cover{
+        .wh(100% ,calc(100vh - 120px));
+        background: rgba(0,0,0,.5);
+        position: absolute;
+        left: 0;
+        top: calc(120px - 100vh);
+        display: none;
+        .bootom-slider {
+            .wh(100%, 441px);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            background: #FFF;
+            position: absolute;
+            bottom: 0;
+            border-radius: 10px 10px 0px 0px;
+            .title {
+                padding: 14px 0 0 20px;
+                font-size: 34px;
+            }
+            .cart-list-bar {
+                flex: 1;
+                .cart-item {
+                    .fj;
+                    border-bottom: 1px solid #F8F8F8;
+                    padding: 0 20px;
+                    margin-bottom: 20px;
+                    .item-left {
+                        display: flex;
+                        .image {
+                            .wh(160px, 160px);
+                            border-radius:4px;
+                            margin-right: 20px;
+                        }
+                        .name {
+                            font-size: 28px;
+                            margin-bottom: 12px;
+                        }
+                        .price {
+                            .sc(30px, @col-r)
+                        }
+                    }
+                    .item-rigth{
+                        display: flex;
+                        align-items: center;
+                        .image-btn{
+                            .wh(40px,40px);
+                            margin: 0 5px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+}

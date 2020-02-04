@@ -1,0 +1,27 @@
+@import '../../style/base.less';
+.dish-bar{
+    flex: 1;
+    height: 100%;
+}
+.dish-list{
+    width: 100%;
+    .fj(flex-start);
+    flex-wrap: wrap;
+    padding: 10px 0;
+}
+.dish-item{
+    .fj(flex-start);
+    flex-direction: column;
+    box-shadow:0px 3px 6px rgba(127, 230, 102, 0.16);
+    margin: 10px 20px;
+    .image{
+        width: 180px;
+        height: 180px;
+    }
+    .name{
+        font-size:32px;
+    }
+    .price{
+        .sc(36px, @col-r)
+    }
+}
