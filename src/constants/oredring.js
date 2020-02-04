@@ -1,0 +1,5 @@
+export const CHANGETYPE = 'CHANGETYPE'
+export const ADDCART = 'ADDCART'
+export const MINUSCART = 'MINUSCART'
+export const DISHCLICK = 'DISHCLICK'
+export const CHANGECART = 'CHANGECART'

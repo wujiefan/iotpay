@@ -1,8 +1,12 @@
-import Taro, { useState, useEffect, useContext } from '@tarojs/taro';
+import Taro, { useState, useEffect } from '@tarojs/taro';
 import { ScrollView, View, Image } from '@tarojs/components';
-import { orderingContext } from "../../pages/ordering/ordering";
+import { useSelector,useDispatch } from '@tarojs/redux'
+import { CHANGECART } from '../../constants/oredring'
+import api from '../../services/api'
+
 import './dishList.less';
 import dishImage from '../../static/images/dish1.png'
+
 function DishList() {
     const [dishDataList, setDishDataList] = useState([
         {
@@ -78,22 +82,48 @@ function DishList() {
             price: 2
         },
     ])
-    const { orderingData, dispatch } = useContext(orderingContext);
+    const ordering = useSelector(state => state.ordering)
+    const dispatch = useDispatch()
+
     const onScrollToLower = e => {
         console.log(e)
     }
+    function getDishList(){
+        let r = my.ix.getSysPropSync({key: 'ro.serialno'});
+        let devicesSN = r?r.value:''
+
+        api.get('secondParty/getDishes',{devicesSN,dishTypeId:ordering.typeId})
+        .then(res => {
+            console.log(res.data)
+            if(res.result){
+                setDishDataList(res.data)
+            }
+        })
+        .catch(res=>{
+            Taro.showToast({
+                title: res.message,
+                icon: 'none',
+                duration: 2000
+            })
+        })
+    }
     useEffect(() => {
-        console.log('dishList')
-    }, [orderingData.typeId])
+        if(ordering.typeId){
+            console.log('dishList')
+            getDishList()
+        }
+    }, [ordering.typeId])
+
     const dishSelect = (item)=>{
-        let changeItem = orderingData.cartList.filter(v => { return v.id == item.id })
+        let changeItem = ordering.cartList.filter(v => { return v.id == item.id })
         if (changeItem.length !== 0){
             changeItem[0].count++
         }else{
-            orderingData.cartList.push({...item,count:1})
+            ordering.cartList.push({...item,count:1})
         }
-        dispatch('DISH_CHANGE')
+        dispatch({type:CHANGECART,cartList:ordering.cartList})
     }
+
     return (
         <ScrollView
             className='dish-bar'

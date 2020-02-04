@@ -1,26 +1,29 @@
-import Taro, { useState, useContext, useMemo,useEffect} from '@tarojs/taro';
+import Taro, { useState, useMemo, useEffect} from '@tarojs/taro';
 import {ScrollView, View, Text, Image } from '@tarojs/components';
-import { orderingContext } from "../../pages/ordering/ordering";
+import { useSelector,useDispatch } from '@tarojs/redux'
+import { CHANGECART } from '../../constants/oredring'
+
 import {accMul} from '../../utils/util.js'
 import './bottomCart.less';
 
 function BottomCart(params) {
     const [showCover, setShowCover] = useState(false)
-    const { orderingData, dispatch } = useContext(orderingContext);
+    const ordering = useSelector(state => state.ordering)
+    const dispatch = useDispatch()
 
     const onScrollToLower = e => {
         console.log(e)
     }
     function amountPrice() {
         let price = 0
-        orderingData.cartList.forEach(v => {
+        ordering.cartList.forEach(v => {
             price += accMul(v.price,v.count)
         })
         return price
     }
     function auountCount() {
         let count = 0
-        orderingData.cartList.forEach(v => {
+        ordering.cartList.forEach(v => {
             count += v.count
         })
         return count
@@ -32,19 +35,19 @@ function BottomCart(params) {
         return auountCount()
     })
     useEffect(()=>{
-        console.log("useEffect")
+        console.log("bottomCart")
     })
-    function subtractCount(item,idx){
+    function minusCount(item,idx){
         if(item.count === 1){
-            orderingData.cartList.splice(idx,1)
+            ordering.cartList.splice(idx,1)
         }else{
             item.count--
         }
-        dispatch('DATA_UPDATE')
+        dispatch({type:CHANGECART,cartList:ordering.cartList})
     }
     function addCount(item){
         item.count++
-        dispatch('DATA_UPDATE')
+        dispatch({type:CHANGECART,cartList:ordering.cartList})
     }
     return (
         <View className="bottom-bar">
@@ -72,7 +75,7 @@ function BottomCart(params) {
                     >
                         <View className="cart-list">
                             {
-                                orderingData.cartList.map((v,i)=>{
+                                ordering.cartList.map((v,i)=>{
                                     return (
                                         <View className="cart-item" key={v.id} data-id={v.id}>
                                             <View className="item-left">
@@ -83,7 +86,7 @@ function BottomCart(params) {
                                                 </View>
                                             </View>
                                             <View className="item-rigth">
-                                                <Image onClick={() => { subtractCount(v, i) }} src={require('../../static/images/subtract.png')} className="image-btn" />{v.count}<Image onClick={() => { addCount(v) }} src={require('../../static/images/add.png')} className="image-btn"/>
+                                                <Image onClick={() => { minusCount(v, i) }} src={require('../../static/images/subtract.png')} className="image-btn" />{v.count}<Image onClick={() => { addCount(v) }} src={require('../../static/images/add.png')} className="image-btn"/>
                                             </View>
                                         </View>
                                     )

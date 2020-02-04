@@ -1,0 +1,1 @@
+export const base = "https://dubbo.51dingdian.com/web/";

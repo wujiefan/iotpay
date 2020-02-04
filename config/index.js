@@ -3,10 +3,8 @@ const config = {
   date: '2020-1-20',
   designWidth: 800,
   deviceRatio: {
-    '640': 2.34 / 2,
     '750': 1,
-    '828': 1.81 / 2,
-    '800': 1.875 / 2,
+    '800': 2.1333 / 2,
   },
   sourceRoot: 'src',
   outputRoot: 'dist',
