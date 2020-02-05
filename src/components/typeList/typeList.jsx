@@ -7,22 +7,10 @@ import './typeList.less';
 import { CHANGETYPE } from '../../constants/oredring'
 
 function TypeList(){
-    const [typeDataList, setTypeDataList] = useState([
-        {
-            id:1,
-            name:'分类1'
-        },
-        {
-            id: 2,
-            name: '分类2'
-        },
-        {
-            id: 3,
-            name: '分类3'
-        },
-    ])
+    const [typeDataList, setTypeDataList] = useState([])
     const [activeIndex, setActiveIndex] = useState(-1)
     const ordering = useSelector(state => state.ordering)
+    const global = useSelector(state => state.global)
     const dispatch = useDispatch()
 
     const onScrollToLower = e => {
@@ -32,25 +20,15 @@ function TypeList(){
         dispatch({type:CHANGETYPE,typeId:id})
         setActiveIndex(idx)
     }
-
     function getTypeList(){
-        let r = my.ix.getSysPropSync({key: 'ro.serialno'});
-        let devicesSN = r?r.value:''
-        api.get('secondParty/dishTypes',{devicesSN})
+        api.get('secondParty/dishTypes',{deviceSN:global.deviceSN})
         .then(res => {
-            console.log(res.data)
-            typeSelect(1,0)
+            console.log(res)
             if(res.result){
                 setTypeDataList(res.data)
+                typeSelect(res.data[0].id,0)
             }
-        })
-        .catch(res=>{
-            Taro.showToast({
-                title: res.message,
-                icon: 'none',
-                duration: 2000
-            })
-        })
+        }).catch((e) => {});
     }
     useEffect(()=>{
         getTypeList()

@@ -5,6 +5,7 @@ import { CHANGECART } from '../../constants/oredring'
 
 import {accMul} from '../../utils/util.js'
 import './bottomCart.less';
+import api from '../../services/api'
 
 function BottomCart(params) {
     const [showCover, setShowCover] = useState(false)
@@ -17,7 +18,7 @@ function BottomCart(params) {
     function amountPrice() {
         let price = 0
         ordering.cartList.forEach(v => {
-            price += accMul(v.price,v.count)
+            price += accMul(v.dishPrice,v.count)
         })
         return price
     }
@@ -49,6 +50,54 @@ function BottomCart(params) {
         item.count++
         dispatch({type:CHANGECART,cartList:ordering.cartList})
     }
+    function toRecharge(){
+        let bizNo = new Date().getTime();
+
+        if(ordering.cartList.length === 0){
+            Taro.showToast({
+                title: '请先选择菜品！',
+                icon: 'none',
+                duration: 2000
+            })
+            return
+        }
+        toPay({deviceSN:'zy72423105204203',barCode:'281027885253915882'})
+        // my.ix.startApp({
+        //     appName: 'cashier',
+        //     bizNo,
+        //     totalAmount: totalPirce,
+        //     success: (res) => {
+        //         toPay(res)
+        //     },
+        //     fail:function(res){
+        //         console.log(res)
+        //     }
+        // });
+    }
+    function toPay(data){
+        let orderDishes = ordering.cartList.map(v=>{
+            let {dishId,dishName,count} = v
+            return {dishId,dishName,dishQuantity:count}
+        })
+        console.log(orderDishes)
+        api.post('secondParty/facePay',{
+            deviceSN:data.deviceSn,
+            qrCode:data.barCode,
+            consumePrice:totalPirce,
+            orderDishes:ordering.cartList
+        })
+        .then(res => {
+            console.log(res.data)
+            if(res.result){
+                Taro.navigateTo({ 
+                    url: '/pages/payResult/payResult?canteenName='+'绿谷餐厅'+'&totalprice='+totalPirce ,
+                    success(){
+                        ispatch({type:CHANGECART,cartList:[]})
+                    }
+                })
+            }
+        }).catch((e) => {});
+    }
     return (
         <View className="bottom-bar">
             <View className="bottom-left">
@@ -62,7 +111,7 @@ function BottomCart(params) {
                     合计：
                     <Text className="price">¥{totalPirce}</Text>
                 </View>
-                <View className="btn-primary">去结算</View>
+                <View className="btn-primary" onClick={toRecharge}>去结算</View>
             </View>
             <View className={'bottom-cover '+(showCover?'show':'')}>
                 <View className="bootom-slider">
@@ -77,12 +126,12 @@ function BottomCart(params) {
                             {
                                 ordering.cartList.map((v,i)=>{
                                     return (
-                                        <View className="cart-item" key={v.id} data-id={v.id}>
+                                        <View className="cart-item" key={v.dishId} data-id={v.dishId}>
                                             <View className="item-left">
-                                                <Image className="image" src={v.image}></Image>
+                                                <Image className="image" src={v.dishHeaderUrl}></Image>
                                                 <View>
-                                                    <View className="name">{v.name}</View>
-                                                    <View className="price">¥{v.price.toFixed(2)}</View>
+                                                    <View className="name">{v.dishName}</View>
+                                                    <View className="price">¥{v.dishPrice.toFixed(2)}</View>
                                                 </View>
                                             </View>
                                             <View className="item-rigth">

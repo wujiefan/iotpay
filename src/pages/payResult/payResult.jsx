@@ -1,4 +1,4 @@
-import Taro, { useState,useEffect } from '@tarojs/taro'
+import Taro, { useState,useEffect,useRef } from '@tarojs/taro'
 import { View, Text, Image } from '@tarojs/components'
 import './payResult.less'
 
@@ -7,25 +7,35 @@ function PayResult() {
     const [canteenName, setCanteenName] = useState('佳和旺餐厅')
     const [resultMessage, setResultMessage] = useState('支付成功！请稍等片刻...')
     const [totalPrice, setTotalPrice] = useState(100)
-    const [containueTimer, setContainueTimer] = useState(null)
     const timeOut = 5;
+    const intervalRef = useRef(null)
+
+    useEffect(()=>{
+        setCanteenName(this.$router.params.canteenName)
+        setTotalPrice(this.$router.params.totalprice)
+        setContainueInterval()
+        return ()=>{
+            clearInterval(intervalRef.containueTimer)
+            intervalRef.containueTimer = null
+        }
+    },[])
+
     const setContainueInterval = ()=>{
-        if(containueTimer){
-            clearInterval(containueTimer)
-            setContainueTimer(null)
+        if(intervalRef.containueTimer){
+            clearInterval(intervalRef.containueTimer)
+            intervalRef.containueTimer = null
         }
         setTimer(timeOut)
-
-        setContainueTimer(setInterval(() => {
+        intervalRef.containueTimer = setInterval(() => {
             setTimer(timer=>{
-                if (timer>0){
+                if (timer>1){
                     return timer - 1
                 }else{
-                    clearInterval(containueTimer)
-                    return timer
+                    // clearInterval(intervalRef.containueTimer)
+                    Taro.navigateBack()
                 }
             })
-        }, 1000))
+        }, 1000)
     }
     return (
         <View className='container'>
@@ -34,10 +44,12 @@ function PayResult() {
                     <View className="name">{canteenName}</View>
                     <Image className="image" src={require('../../static/images/text.png')}/>
                     <View className="message">{resultMessage}</View>
-                    <View className="price">¥ {totalPrice.toFixed(2)}</View>
+                    <View className="price">¥ {totalPrice}</View>
                 </View>
                 <View className="bottom">
-                    <View className="btn-containue" onClick={setContainueInterval}>
+                    <View className="btn-containue" onClick={()=>{
+                        Taro.navigateBack()
+                    }}>
                         继续点餐
                         {timer?<Text>({timer})</Text>:''}
                     </View>

@@ -1,12 +1,12 @@
 import Taro from '@tarojs/taro'
 import { base } from './config'
-
-let token = ''
+import { resolve } from 'upath';
+import { rejects } from 'assert';
 
 export default {
     baseOptions(params, method = 'GET') {
       let { url, data } = params
-      let contentType = 'application/x-www-form-urlencoded'
+      let contentType = 'application/json'
       contentType = params.contentType || contentType
       const option = {
         isShowLoading: false,
@@ -14,13 +14,9 @@ export default {
         url: base + url,
         data: data,
         method: method,
-        header: { 'content-type': contentType, 'token': token },
+        header: { 'content-type': contentType },
         success(res) {
-          if (res.statusCode === 403) {
-            return
-          }else if (res.statusCode === 404) {
-            return
-          } else if (res.statusCode === 200) {
+          if (res.statusCode === 200) {
             return res.data
           }
         },
@@ -28,7 +24,21 @@ export default {
           console.log(err)
         }
       }
-      return Taro.request(option)
+      return new Promise((resolve,reject)=>{
+        Taro.request(option).then(res=>{
+          if (res.statusCode === 200) {
+            resolve(res.data)
+          }else{
+            console.log(res.data)
+            Taro.showToast({
+              title: res.data.message,
+              icon: 'none',
+              duration: 2000
+            })
+            reject()
+          }
+        })
+      })
     },
     get(url, data = '') {
       let option = { url, data }

@@ -4,8 +4,7 @@ const INITIAL_STATE = {
     cartList: [],
     typeId: 0,
 }
-export default function counter (state = INITIAL_STATE, action) {
-    console.log(action)
+export default function oredring (state = INITIAL_STATE, action) {
     switch (action.type) {
         case CHANGECART:
             return {

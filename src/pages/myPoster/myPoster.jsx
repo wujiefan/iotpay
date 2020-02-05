@@ -23,5 +23,7 @@ function MyPoster() {
         </View>
     )
 }
-
+MyPoster.config= {
+    navigationBarTitleText: '首页'
+}
 export default MyPoster

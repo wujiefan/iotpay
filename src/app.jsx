@@ -1,12 +1,19 @@
 import Taro, { Component } from '@tarojs/taro'
-import { Provider } from '@tarojs/redux'
+import { Provider,connect  } from '@tarojs/redux'
 import configStore from './store'
+import { setDevice } from './actions/global'
 
 import Index from './pages/index'
 
 import './app.less'
 
 const store = configStore()
+
+@connect(({ global }) => ({
+  global
+}),{
+  setDevice,
+})
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -26,9 +33,14 @@ class App extends Component {
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
-      navigationBarTitleText: 'WeChat',
+      navigationBarTitleText: '效准',
       navigationBarTextStyle: 'black'
     }
+  }
+  componentWillMount(){
+    let r = my.ix.getSysPropSync({key: 'ro.serialno'});
+    let deviceSN = r?r.value:'zy72423105204203'
+    this.props.setDevice(deviceSN)
   }
 
   // 在 App 类中的 render() 函数没有实际作用
