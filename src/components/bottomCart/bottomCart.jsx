@@ -35,6 +35,9 @@ function BottomCart(params) {
     const totalCount= useMemo(() => {
         return auountCount()
     })
+    const totalKind = useMemo(() => {
+        return ordering.cartList.length
+    },[ordering.cartList.length])
     useEffect(()=>{
         console.log("bottomCart")
     })
@@ -77,14 +80,14 @@ function BottomCart(params) {
     function toPay(data){
         let orderDishes = ordering.cartList.map(v=>{
             let {dishId,dishName,count} = v
-            return {dishId,dishName,dishQuantity:count}
+            return {dish_id:dishId,dish_name:dishName,dish_quantity:count}
         })
         console.log(orderDishes)
         api.post('secondParty/facePay',{
             deviceSN:data.deviceSn,
             qrCode:data.barCode,
             consumePrice:totalPirce,
-            orderDishes:ordering.cartList
+            orderDishes
         })
         .then(res => {
             console.log(res.data)
@@ -92,7 +95,7 @@ function BottomCart(params) {
                 Taro.navigateTo({ 
                     url: '/pages/payResult/payResult?canteenName='+'绿谷餐厅'+'&totalprice='+totalPirce ,
                     success(){
-                        ispatch({type:CHANGECART,cartList:[]})
+                        dispatch({type:CHANGECART,cartList:[]})
                     }
                 })
             }
@@ -102,7 +105,7 @@ function BottomCart(params) {
         <View className="bottom-bar">
             <View className="bottom-left">
                 <View className="cart" onClick={() => {setShowCover(!showCover)}}>
-                    <View className="count">{totalCount}</View>
+                    <View className="count">{totalKind}</View>
                 </View>
                 <View>共{totalCount}件</View>
             </View>
