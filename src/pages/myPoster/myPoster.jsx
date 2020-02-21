@@ -5,14 +5,18 @@ import './myPoster.less'
 function MyPoster() {
     const [showDefault, setShowDefault] = useState(false)
     const onDisplaySuccess = ()=>{
+        console.log('poster display success');
         setShowDefault(true)
+    }
+    const onDisplayFail = (e)=>{
+        console.log('poster display fail, error = ' + e.detail.error);
     }
     return (
         <View className="container">
             <View className="poster-container">
                 {
                     showDefault
-                    ? <poster class="my-poster" posid="idle_pos"  onSuccess={onDisplaySuccess} />
+                    ? <poster class="my-poster" posid="idle_pos"  onSuccess={onDisplaySuccess}  onFail={onDisplayFail}/>
                     : <Image class="default-poster" src={require('../../static/images/bill.jpg')} />
                 }
 

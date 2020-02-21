@@ -38,8 +38,8 @@ class App extends Component {
     }
   }
   componentWillMount(){
-    let r = my.ix.getSysPropSync({key: 'ro.serialno'});
-    let deviceSN = r?r.value:'zy72423105204203'
+    let r = my.ix.getSysPropSync({key: 'ro.serialno'});//获取设备编号
+    let deviceSN = r?r.value:'QCF420190517005761'
     this.props.setDevice(deviceSN)
   }
 

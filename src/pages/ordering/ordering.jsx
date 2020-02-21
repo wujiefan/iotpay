@@ -6,24 +6,8 @@ import './ordering.less'
 import TypeList from "../../components/typeList/typeList";
 import DishList from "../../components/dishList/dishList";
 import BottomCart from "../../components//bottomCart/bottomCart";
-// const reducer = (state, action) => {
-//     console.log(state, action)
-//     switch (action) {
-//         case 'TYPE_CHANGE':
-//             return state;
-//         case 'DISH_CHANGE':
-//             return state;
-//         case 'DATA_UPDATE':
-//             return state;
-//         default:
-//             return state
-//     }
-// }
+
 export const Ordering = ()=>{
-    // const [orderingData, dispatch] = useReducer(reducer, {
-    //     typeId:0,
-    //     cartList:[]
-    // })
     return(
         <View className='container'>
             <View className="content">

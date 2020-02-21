@@ -116,8 +116,8 @@ function BottomCart(params) {
                 </View>
                 <View className="btn-primary" onClick={toRecharge}>去结算</View>
             </View>
-            <View className={'bottom-cover '+(showCover?'show':'')}>
-                <View className="bootom-slider">
+            <View className={'bottom-cover '+(showCover?'show':'')} onClick={()=>{setShowCover(false)}}>
+                <View className="bootom-slider" onClick={(e)=>{e.stopPropagation()}}>
                     <View className="title"> 购物车 </View>
                     <ScrollView
                         className='cart-list-bar'
