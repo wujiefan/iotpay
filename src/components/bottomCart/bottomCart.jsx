@@ -40,6 +40,11 @@ function BottomCart(params) {
     },[ordering.cartList.length])
     useEffect(()=>{
         console.log("bottomCart")
+        const query = Taro.createSelectorQuery().select('.cart').boundingClientRect();//获取节点信息
+        query.exec(res => {
+            console.log('这是res',res);
+        })
+
     })
     function minusCount(item,idx){
         if(item.count === 1){
