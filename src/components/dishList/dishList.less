@@ -12,7 +12,6 @@
 .dish-item{
     .fj(flex-start);
     flex-direction: column;
-    box-shadow:0px 3px 6px rgba(127, 230, 102, 0.16);
     margin: 10px 20px;
     .image{
         width: 180px;
@@ -25,6 +24,9 @@
     .price{
         .sc(36px, @col-r);
         margin-top: 5px;
+    }
+    &:active{
+        box-shadow:0px 3px 6px rgba(85, 129, 254, 0.2);
     }
 }
 

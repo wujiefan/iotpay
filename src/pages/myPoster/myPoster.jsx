@@ -3,21 +3,21 @@ import { View, Image } from '@tarojs/components'
 import './myPoster.less'
 
 function MyPoster() {
-    const [showDefault, setShowDefault] = useState(false)
+    const [showDefault, setShowDefault] = useState(true)
     const onDisplaySuccess = ()=>{
         console.log('poster display success');
-        setShowDefault(true)
     }
     const onDisplayFail = (e)=>{
         console.log('poster display fail, error = ' + e.detail.error);
+        setShowDefault(false)
     }
     return (
         <View className="container">
             <View className="poster-container">
                 {
                     showDefault
-                    ? <poster class="my-poster" posid="idle_pos"  onSuccess={onDisplaySuccess}  onFail={onDisplayFail}/>
-                    : <Image class="default-poster" src={require('../../static/images/bill.jpg')} />
+                    ? <poster style="width:100%;height:78vh" class="my-poster" posid="idle_pos"  onSuccess={onDisplaySuccess}  onFail={onDisplayFail}/>
+                    : <Image className="default-poster" src={require('../../static/images/bill.jpg')} />
                 }
 
             </View>

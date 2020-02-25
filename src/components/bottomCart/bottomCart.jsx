@@ -42,7 +42,7 @@ function BottomCart(params) {
         console.log("bottomCart")
         const query = Taro.createSelectorQuery().select('.cart').boundingClientRect();//获取节点信息
         query.exec(res => {
-            console.log('这是res',res);
+            // console.log('这是res',res);
         })
 
     })
@@ -97,7 +97,7 @@ function BottomCart(params) {
         .then(res => {
             console.log(res.data)
             if(res.result){
-                Taro.navigateTo({ 
+                Taro.navigateTo({
                     url: '/pages/payResult/payResult?canteenName='+'绿谷餐厅'+'&totalprice='+totalPirce ,
                     success(){
                         dispatch({type:CHANGECART,cartList:[]})
