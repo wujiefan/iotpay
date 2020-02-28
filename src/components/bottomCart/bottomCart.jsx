@@ -3,14 +3,17 @@ import {ScrollView, View, Text, Image } from '@tarojs/components';
 import { useSelector,useDispatch } from '@tarojs/redux'
 import { CHANGECART } from '../../constants/oredring'
 
-import {accMul} from '../../utils/util.js'
+import { accMul, showToast} from '../../utils/util.js'
 import './bottomCart.less';
 import api from '../../services/api'
 
 function BottomCart(params) {
     const [showCover, setShowCover] = useState(false)
     const ordering = useSelector(state => state.ordering)
+    const global = useSelector(state => state.global)
     const dispatch = useDispatch()
+    let _keyEventListener = null
+    let inputPrice = 0
 
     const onScrollToLower = e => {
         console.log(e)
@@ -38,13 +41,25 @@ function BottomCart(params) {
     const totalKind = useMemo(() => {
         return ordering.cartList.length
     },[ordering.cartList.length])
+
     useEffect(()=>{
-        console.log("bottomCart")
+        console.log('bind keyEventListener')
+        _keyEventListener = onKeyPress
+        my.ix.onKeyEventChange(_keyEventListener)
+        return ()=>{
+            console.log('unbind keyEventListener')
+            if (_keyEventListener){
+                my.ix.offKeyEventChange(_keyEventListener)
+                _keyEventListener = null
+            }
+        }
+    },[])
+    useEffect(()=>{
+        console.log("bottomCart updata")
         const query = Taro.createSelectorQuery().select('.cart').boundingClientRect();//获取节点信息
         query.exec(res => {
             // console.log('这是res',res);
         })
-
     })
     function minusCount(item,idx){
         if(item.count === 1){
@@ -60,7 +75,6 @@ function BottomCart(params) {
     }
     function toRecharge(){
         let bizNo = new Date().getTime();
-
         if(ordering.cartList.length === 0){
             Taro.showToast({
                 title: '请先选择菜品！',
@@ -69,18 +83,8 @@ function BottomCart(params) {
             })
             return
         }
-        toPay({deviceSN:'zy72423105204203',barCode:'281027885253915882'})
-        // my.ix.startApp({
-        //     appName: 'cashier',
-        //     bizNo,
-        //     totalAmount: totalPirce,
-        //     success: (res) => {
-        //         toPay(res)
-        //     },
-        //     fail:function(res){
-        //         console.log(res)
-        //     }
-        // });
+        callCashier()
+        // toPay({ deviceSN: global.deviceSN,barCode:'281027885253915882'})
     }
     function toPay(data){
         let orderDishes = ordering.cartList.map(v=>{
@@ -88,23 +92,63 @@ function BottomCart(params) {
             return {dish_id:dishId,dish_name:dishName,dish_quantity:count}
         })
         console.log(orderDishes)
+        console.log(totalPirce, inputPrice)
         api.post('secondParty/facePay',{
             deviceSN:data.deviceSn,
             qrCode:data.barCode,
-            consumePrice:totalPirce,
+            consumePrice:totalPirce + inputPrice,
             orderDishes
         })
         .then(res => {
             console.log(res.data)
             if(res.result){
+                inputPrice = 0
                 Taro.navigateTo({
                     url: '/pages/payResult/payResult?canteenName='+'绿谷餐厅'+'&totalprice='+totalPirce ,
                     success(){
                         dispatch({type:CHANGECART,cartList:[]})
                     }
                 })
+            }else{
+                showToast(res.message)
             }
         }).catch((e) => {});
+    }
+    function onKeyPress(r) {
+        console.log('KeyEvent', r);
+        switch (r.keyCode) {
+            case 131:
+                setTimeout(() => {
+                    inputPrice =    Number(r.amount)
+                    callCashier()
+                }, 200)
+                break;
+        }
+    }
+    function callCashier() {
+        let bizNo = new Date().getTime();
+        let amount = inputPrice + totalPirce
+        console.log(totalPirce, inputPrice, amount)
+        //打开收银机
+        my.ix.startApp({
+            appName: 'cashier',
+            bizNo,
+            totalAmount: amount,
+            success: (res) => {
+                console.log(res)
+                if (res.success) {
+                    if (res.codeType === "C" || res.codeType === "F") {
+                        toPay(res)
+                    }
+                } else {
+                    showToast(res.errorMessage)
+                }
+            },
+            fail: function (res) {
+                console.log(res)
+                showToast('未能完成支付')
+            }
+        });
     }
     return (
         <View className="bottom-bar">

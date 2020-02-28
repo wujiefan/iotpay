@@ -1,3 +1,5 @@
+import Taro from '@tarojs/taro'
+
 export const accAdd = (arg1, arg2)=>{
   var r1, r2, m;
   try {
@@ -53,4 +55,11 @@ export const accDivCoupon = (arg1, arg2) => {
     r1 = Number(arg1.toString().replace(".", ""))
     r2 = Number(arg2.toString().replace(".", ""))
     return (r1 / r2) * pow(10, t2 - t1);
+}
+export const showToast = (msg) => {
+  Taro.showToast({
+    title: msg,
+    icon: 'none',
+    duration: 3000
+  })
 }
