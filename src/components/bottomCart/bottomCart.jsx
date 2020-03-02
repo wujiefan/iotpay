@@ -3,14 +3,16 @@ import {ScrollView, View, Text, Image } from '@tarojs/components';
 import { useSelector,useDispatch } from '@tarojs/redux'
 import { CHANGECART } from '../../constants/oredring'
 
-import { accMul, showToast} from '../../utils/util.js'
+import { accAdd, accMul, showToast} from '../../utils/util.js'
+import printer from '../../utils/printer'
+
 import './bottomCart.less';
 import api from '../../services/api'
 
 function BottomCart(params) {
     const [showCover, setShowCover] = useState(false)
     const ordering = useSelector(state => state.ordering)
-    const global = useSelector(state => state.global)
+    // const global = useSelector(state => state.global)
     const dispatch = useDispatch()
     let _keyEventListener = null
     let inputPrice = 0
@@ -21,14 +23,14 @@ function BottomCart(params) {
     function amountPrice() {
         let price = 0
         ordering.cartList.forEach(v => {
-            price += accMul(v.dishPrice,v.count)
+            price = accAdd(price,accMul(v.dishPrice,v.count))
         })
         return price
     }
     function auountCount() {
         let count = 0
         ordering.cartList.forEach(v => {
-            count += v.count
+            count = accAdd(count,v.count)
         })
         return count
     }
@@ -46,8 +48,12 @@ function BottomCart(params) {
         console.log('bind keyEventListener')
         _keyEventListener = onKeyPress
         my.ix.onKeyEventChange(_keyEventListener)
+
+        printer.initPrinter();
+
         return ()=>{
             console.log('unbind keyEventListener')
+            printer.closePrinter();
             if (_keyEventListener){
                 my.ix.offKeyEventChange(_keyEventListener)
                 _keyEventListener = null
@@ -56,10 +62,11 @@ function BottomCart(params) {
     },[])
     useEffect(()=>{
         console.log("bottomCart updata")
-        const query = Taro.createSelectorQuery().select('.cart').boundingClientRect();//获取节点信息
-        query.exec(res => {
-            // console.log('这是res',res);
-        })
+        // 获取节点
+        // const query = Taro.createSelectorQuery().select('.cart').boundingClientRect();
+        // query.exec(res => {
+        //     console.log('这是res',res);
+        // })
     })
     function minusCount(item,idx){
         if(item.count === 1){
@@ -83,20 +90,26 @@ function BottomCart(params) {
             })
             return
         }
-        callCashier()
+        callCashier(1)
         // toPay({ deviceSN: global.deviceSN,barCode:'281027885253915882'})
     }
-    function toPay(data){
-        let orderDishes = ordering.cartList.map(v=>{
-            let {dishId,dishName,count} = v
-            return {dish_id:dishId,dish_name:dishName,dish_quantity:count}
-        })
-        console.log(orderDishes)
-        console.log(totalPirce, inputPrice)
+    function toPay(data,type){
+        let orderDishes = []
+        let consumePrice = 0
+        if(type === 1){
+            orderDishes = ordering.cartList.map(v => {
+                let { dishId, dishName, count } = v
+                return { dish_id: dishId, dish_name: dishName, dish_quantity: count }
+            })
+            consumePrice = totalPirce
+        }else{
+            consumePrice = inputPrice
+        }
+        console.log(consumePrice,orderDishes)
         api.post('secondParty/facePay',{
             deviceSN:data.deviceSn,
             qrCode:data.barCode,
-            consumePrice:totalPirce + inputPrice,
+            consumePrice,
             orderDishes
         })
         .then(res => {
@@ -110,6 +123,7 @@ function BottomCart(params) {
                     }
                 })
             }else{
+                console.log(res.message)
                 showToast(res.message)
             }
         }).catch((e) => {});
@@ -119,26 +133,25 @@ function BottomCart(params) {
         switch (r.keyCode) {
             case 131:
                 setTimeout(() => {
-                    inputPrice =    Number(r.amount)
-                    callCashier()
+                    inputPrice =  Number(r.amount)
+                    callCashier(2)
                 }, 200)
                 break;
         }
     }
-    function callCashier() {
+    function callCashier(type) {//1结算2手动
         let bizNo = new Date().getTime();
-        let amount = inputPrice + totalPirce
-        console.log(totalPirce, inputPrice, amount)
+        let amount = type === 1 ? totalPirce : inputPrice
         //打开收银机
         my.ix.startApp({
             appName: 'cashier',
             bizNo,
-            totalAmount: amount,
+            totalAmount: amount.toFixed(2),
             success: (res) => {
                 console.log(res)
                 if (res.success) {
                     if (res.codeType === "C" || res.codeType === "F") {
-                        toPay(res)
+                        toPay(res,type)
                     }
                 } else {
                     showToast(res.errorMessage)
@@ -164,6 +177,7 @@ function BottomCart(params) {
                     <Text className="price">¥{totalPirce}</Text>
                 </View>
                 <View className="btn-primary" onClick={toRecharge}>去结算</View>
+                <View onClick={() => {printer.printOrder()}}>打印</View>
             </View>
             <View className={'bottom-cover '+(showCover?'show':'')} onClick={()=>{setShowCover(false)}}>
                 <View className="bootom-slider" onClick={(e)=>{e.stopPropagation()}}>

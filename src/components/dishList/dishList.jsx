@@ -37,10 +37,11 @@ function DishList() {
     }, [ordering.typeId])
 
     const dishSelect = (item,event)=>{
-        let changeItem = ordering.cartList.filter(v => { return v.id == item.id })
+        let changeItem = ordering.cartList.filter(v => { return v.dishId == item.dishId })
         let clientX = event.currentTarget.clientX
         let clientY = event.currentTarget.clientY
         let {windowHeight} = Taro.getSystemInfoSync()
+
         if (changeItem.length !== 0){
             changeItem[0].count++
         }else{
@@ -50,13 +51,13 @@ function DishList() {
         let _animation = Taro.createAnimation()
         let _animations = Taro.createAnimation()
         _animation.left(clientX).top(clientY).opacity(1).step({duration:0});
-        setAnimation(_animation.export()) 
+        setAnimation(_animation.export())
         // setShowAnmimation(true) )
         setTimeout(() => {
-            _animations.left(0).top(windowHeight).opacity(0).step({duration:400}); 
+            _animations.left(0).top(windowHeight).opacity(0).step({duration:400});
             setAnimation(_animations.export())
         }, 100);
-        
+
         dispatch({type:CHANGECART,cartList:ordering.cartList})
     }
 
