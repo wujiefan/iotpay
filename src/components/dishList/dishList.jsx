@@ -20,7 +20,7 @@ function DishList() {
         console.log(e)
     }
     function getDishList(){
-        api.get('secondParty/getDishes',{deviceSN:global.deviceSN,dishTypeId:ordering.typeId})
+        api.get('secondParty/alipay/getDishes',{deviceSN:global.deviceSN,dishTypeId:ordering.typeId})
         .then(res => {
             console.log(res.data)
             if(res.result){
@@ -75,7 +75,7 @@ function DishList() {
                             <View key={v.dishId} className='dish-item' data-id={v.dishId} onClick={(e) => { dishSelect(v,e) }} >
                                 <Image className="image" src={v.dishHeaderUrl}/>
                                 <View className="name" >{v.dishName}</View>
-                                <View className="price">¥ {v.dishPrice}</View>
+                                <View className="price">¥ {v.dishPrice.toFixed(2)}</View>
                             </View>
                         )
                     })

@@ -44,7 +44,7 @@ function PayResult() {
                     <View className="name">{canteenName}</View>
                     <Image className="image" src={require('../../static/images/text.png')}/>
                     <View className="message">{resultMessage}</View>
-                    <View className="price">¥ {totalPrice}</View>
+                    <View className="price">¥ {totalPrice.toFixed(2)}</View>
                 </View>
                 <View className="bottom">
                     <View className="btn-containue" onClick={()=>{

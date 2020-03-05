@@ -21,7 +21,7 @@ function TypeList(){
         setActiveIndex(idx)
     }
     function getTypeList(){
-        api.get('secondParty/dishTypes',{deviceSN:global.deviceSN})
+        api.get('secondParty/alipay/dishTypes',{deviceSN:global.deviceSN})
         .then(res => {
             console.log(res)
             if(res.result){

@@ -16,6 +16,7 @@ function BottomCart(params) {
     const dispatch = useDispatch()
     let _keyEventListener = null
     let inputPrice = 0
+    let waitTime = 0
 
     const onScrollToLower = e => {
         console.log(e)
@@ -106,22 +107,31 @@ function BottomCart(params) {
             consumePrice = inputPrice
         }
         console.log(consumePrice,orderDishes)
-        api.post('secondParty/facePay',{
+        api.post('secondParty/alipay/facePay',{
             deviceSN:data.deviceSn,
             qrCode:data.barCode,
             consumePrice,
             orderDishes
         })
         .then(res => {
-            console.log(res.data)
+            console.log(res)
             if(res.result){
                 inputPrice = 0
-                Taro.navigateTo({
-                    url: '/pages/payResult/payResult?canteenName='+'绿谷餐厅'+'&totalprice='+totalPirce ,
-                    success(){
-                        dispatch({type:CHANGECART,cartList:[]})
-                    }
+                Taro.showLoading({
+                    title: '',
+                    mask: true
                 })
+                setTimeout(() => {
+                    Taro.hideLoading()
+                    Taro.navigateTo({
+                        url: '/pages/payResult/payResult?canteenName=' + res.data + '&totalprice=' + consumePrice,
+                        success() {
+                            console.log('pay callback')
+                            dispatch({ type: CHANGECART, cartList: [] })
+                            setShowCover(false)
+                        }
+                    })
+                }, waitTime*1000);
             }else{
                 console.log(res.message)
                 showToast(res.message)
@@ -150,8 +160,12 @@ function BottomCart(params) {
             success: (res) => {
                 console.log(res)
                 if (res.success) {
-                    if (res.codeType === "C" || res.codeType === "F") {
+                    if (res.codeType === "C") {
+                        waitTime = 3
                         toPay(res,type)
+                    } else if (res.codeType === "F"){
+                        waitTime = 0
+                        toPay(res, type)
                     }
                 } else {
                     showToast(res.errorMessage)
@@ -174,7 +188,7 @@ function BottomCart(params) {
             <View className="bottom-right">
                 <View className="total-price">
                     合计：
-                    <Text className="price">¥{totalPirce}</Text>
+                    <Text className="price">¥{totalPirce.toFixed(2)}</Text>
                 </View>
                 <View className="btn-primary" onClick={toRecharge}>去结算</View>
                 <View onClick={() => {printer.printOrder()}}>打印</View>
